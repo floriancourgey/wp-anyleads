@@ -79,6 +79,14 @@ add_action('com.floriancourgey.anyleads.callback', 'callback');
        $this->options = get_option('my_option_name');
        ?>
        <div class="wrap">
+         <style media="screen">
+           input{
+             width:100%;
+           }
+           input[type="submit"]{
+             width: initial;
+           }
+         </style>
            <h1>Settings Anyleads connector <small>by floriancourgey.com</small> </h1>
            <form method="post" action="options.php">
            <?php
