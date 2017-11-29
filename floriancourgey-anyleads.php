@@ -16,25 +16,29 @@ function callback($arg){
     return;
   }
 
-  $apiKey = get_option('my_option_name')['api_key'];
-  $listeId = get_option('my_option_name')['list_id'];
-  $url = 'https://api.anyleads.com/v1/your-data/create-contact';
+  try{
+    $apiKey = get_option('my_option_name')['api_key'];
+    $listeId = get_option('my_option_name')['list_id'];
+    $url = 'https://api.anyleads.com/v1/your-data/create-contact';
 
-  $post = [
-    'api_key' => $apiKey,
-    'data_create' => [
-      'user_email' => $arg['email']['value'],
-      'user_list_id' => $listeId,
-      'user_city' => 'New York',
-      'user_first_name' =>'NAME',
-      'user_last_name' => '',
-    ],
-  ];
+    $post = [
+      'api_key' => $apiKey,
+      'data_create' => [
+        'user_email' => $arg['email']['value'],
+        'user_list_id' => $listeId,
+        'user_city' => 'New York',
+        'user_first_name' =>'NAME',
+        'user_last_name' => '',
+      ],
+    ];
 
-  $result = wp_remote_post($url, [
-    'body' => json_encode($post),
-    'headers'   => ['Content-Type' => 'application/json; charset=utf-8'],
-  ]);
+    $result = wp_remote_post($url, [
+      'body' => json_encode($post),
+      'headers'   => ['Content-Type' => 'application/json; charset=utf-8'],
+    ]);
+  } catch (Exception $e){
+    return;
+  }
 
   // wp_mail('florian@floriancourgey.com', 'test callback', "working ??? <pre>".print_r($post, true).print_r($result, true).'</pre>');
 }
