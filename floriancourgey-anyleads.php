@@ -36,7 +36,7 @@ function callback($arg){
     'headers'   => ['Content-Type' => 'application/json; charset=utf-8'],
   ]);
 
-  wp_mail('florian@floriancourgey.com', 'test callback', "working ??? <pre>".print_r($post, true).print_r($result, true).'</pre>');
+  // wp_mail('florian@floriancourgey.com', 'test callback', "working ??? <pre>".print_r($post, true).print_r($result, true).'</pre>');
 }
 add_action('com.floriancourgey.anyleads.callback', 'callback');
 
