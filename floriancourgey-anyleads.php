@@ -36,11 +36,19 @@ function callback($arg){
       'body' => json_encode($post),
       'headers'   => ['Content-Type' => 'application/json; charset=utf-8'],
     ]);
+		$feed = unserialize(get_option('anyleads_feed'));
+		if(!is_array($feed)){
+			$feed = [];
+		} else {
+			// pop out if count > 10
+		}
+		$feed[] = $result;
+    $feedString = serialize($feed);
+		update_option('anyleads_feed', $feedString );
+    // wp_mail('florian@floriancourgey.com', 'test callback', "working ??? <pre>".print_r(json_encode($result), true).'<br>'.print_r(serialize($result)).'<br>'.print_r($result, true).'</pre>');
   } catch (\Exception $e){
     return;
   }
-
-  // wp_mail('florian@floriancourgey.com', 'test callback', "working ??? <pre>".print_r($post, true).print_r($result, true).'</pre>');
 }
 add_action('com.floriancourgey.anyleads.callback', 'callback');
 
@@ -55,9 +63,6 @@ add_action('com.floriancourgey.anyleads.callback', 'callback');
        add_action('admin_init', array($this, 'page_init'));
    }
 
-   /**
-    * Add options page
-    */
    public function add_plugin_page() {
        // This page will be under "Settings"
        add_options_page(
@@ -69,9 +74,6 @@ add_action('com.floriancourgey.anyleads.callback', 'callback');
       );
    }
 
-   /**
-    * Options page callback
-    */
    public function create_admin_page() {
        // Set class property
        $this->options = get_option('my_option_name');
@@ -86,13 +88,51 @@ add_action('com.floriancourgey.anyleads.callback', 'callback');
                submit_button();
            ?>
            </form>
+					 <h1>Activity feed (10 last calls)</h1>
+           <?php
+           $feed = unserialize(get_option('anyleads_feed'));
+           print_r($feed[0]['headers']->getAll()['date']);
+           if(!is_array($feed)){
+         			$feed = [];
+            }
+            ?>
+            <table class="wp-list-table widefat striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Load in</th>
+                  <th>State</th>
+                  <th>Event</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($feed as $f) {?>
+                  <?php $body = json_decode($f['body'], true) ?>
+                  <tr class="">
+                    <?php if(is_array($body)){?>
+                      <td><?= $f['headers']->getAll()['date'] ?></td>
+                      <td><?= $body['load_in'] ?></td>
+                      <td><?= $body['state'] ?></td>
+                      <td><?= $body['event'] ?></td>
+                      <td><?= $body['message'] ?></td>
+                    <?php } else { ?>
+                      <td>Unable to parse body :</td>
+                      <td colspan="4"><?php print_r($f) ?></td>
+                    <?php } ?>
+                  </tr>
+                  <!-- tr for debugging -->
+                  <!-- <tr>
+                    <td colspan="4"><?php print_r($f) ?></td>
+                  </tr> -->
+                <?php } ?>
+              </tbody>
+            </table>
+
        </div>
        <?php
    }
 
-   /**
-    * Register and add settings
-    */
    public function page_init() {
        register_setting(
            'my_option_group', // Option group
@@ -132,11 +172,6 @@ add_action('com.floriancourgey.anyleads.callback', 'callback');
       );
    }
 
-   /**
-    * Sanitize each setting field as needed
-    *
-    * @param array $input Contains all settings fields as array keys
-    */
    public function sanitize($input) {
        $new_input = [];
        foreach ($input as $key => $value) {
