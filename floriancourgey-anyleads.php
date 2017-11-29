@@ -36,7 +36,7 @@ function callback($arg){
       'body' => json_encode($post),
       'headers'   => ['Content-Type' => 'application/json; charset=utf-8'],
     ]);
-  } catch (Exception $e){
+  } catch (\Exception $e){
     return;
   }
 
